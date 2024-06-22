@@ -22,6 +22,14 @@ Please go through the folders by this order - 1. The main (root) folder with the
 1.Pandas
 2.Numpy
 3.Matplotlib.pyplot
-4.Seaborn
-5.scikit (Model_selection) / sklearn.preprocessing (train_test_split)
-6. Decision trees / Grid Search CV / XGB Boost / Random Forest
+4.Seaborn, datetime
+5.scikit (Model_selection) / sklearn.preprocessing - StandardScaler, from model_selection train_test_split
+6. Decision trees / Grid Search CV / XGB Boost / Random Forest/ LinearRegression/ plot_importance
+7. Various metrics eg. f1_score, roc_curve, accuracy_score 
+
+
+
+
+Feel Free to reach out to me 
+
+Linkdin - https://www.linkedin.com/in/swapnanil-bala-854b722a7/
