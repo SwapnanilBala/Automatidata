@@ -1,79 +1,62 @@
-# Automatidata - NYC Cab Generous Tip Predictor
+# Automatidata: NYC Taxi Generous-Tip Predictor
 
----
+Predicting whether a New York City taxi rider will tip **20% or more**, using 2017 NYC TLC yellow-cab
+trip data. Framed as consulting work for a fictional firm, Automatidata, this is a project from the
+**Google Advanced Data Analytics Professional Certificate**.
 
-### Project Objective
+## Results
 
-For this project, I worked with the **New York City Taxi & Limousine Commission (TLC)** dataset through a fictional consulting firm called **Automatidata**. The main goal was to build a **machine learning model** that predicts how likely a taxi driver is to receive a generous tip from a passenger.
+**Champion: random forest. On the test set it finds 78% of generous tippers, with 0.72 F1.**
 
-I went through a full data science workflow here — starting from raw data inspection all the way to training and evaluating ML models. Along the way, I cleaned the data, ran statistical tests, and tried out different modeling approaches to see what works best.
+| Model | Split | Recall | Precision | F1 | Accuracy |
+|---|---|---:|---:|---:|---:|
+| Random forest | 4-fold CV | 0.757 | 0.675 | 0.714 | 0.680 |
+| XGBoost | 4-fold CV | 0.724 | 0.673 | 0.698 | 0.670 |
+| XGBoost | Test | 0.748 | 0.676 | 0.710 | 0.678 |
+| **Random forest** | **Test** | **0.779** | **0.675** | **0.723** | **0.687** |
 
----
+The classes are close to balanced: 52.6% of card-paying riders tipped at least 20%. So the model's
+gain over guessing is real but moderate. False positives (predicting a generous tip that doesn't come)
+are about twice as common as false negatives, which is the worse error for a driver's expectations.
 
-### Project Overview
+Before classification, a multiple linear regression predicted the **fare** with test R² 0.83 (MAE
+$2.12, RMSE $4.19). Its prediction became a feature for the classifier.
 
-I organized the project into separate folders, each covering a different stage of the analysis. If you want to follow along with my thought process, I'd recommend going through them in this order:
+<p align="center"><img src="docs/feature-importances.png" alt="Random forest feature importances: VendorID_2 highest, then predicted_fare, mean_duration and mean_distance" width="560"></p>
 
-1. **Root Folder — Preliminary Analysis**
-   Initial look at the dataset structure, data quality checks, and some basic observations.
+**What drove it:** the vendor, then the predicted fare, mean trip duration and mean distance for the
+route. That `VendorID` ranks first suggests one vendor attracts more generous riders, which is worth a
+statistical test of its own.
 
-2. **Exploratory Data Analysis (EDA)**
-   Deeper visual exploration, handling missing data, detecting outliers, and studying correlations between variables.
+## How the target was built
 
-3. **Statistical Review & A/B Testing**
-   Hypothesis testing to validate assumptions about what drives fare and tip amounts.
+- Only credit-card trips are used. Cash tips aren't recorded, so cash trips show $0.
+- `tip_percent = tip_amount / (total_amount − tip_amount)`, rounded to 3 places. Without rounding, floating-point error mislabels about 1,800 riders who did tip 20%.
+- `generous = tip_percent ≥ 0.20`.
 
-4. **Multiple Linear Regression Model**
-   My first attempt at regression modeling, including checking for multicollinearity.
+## The workflow
 
-5. **Machine Learning Model Building**
-   More advanced models using ensemble methods and boosting algorithms to improve prediction accuracy.
+Each stage has a notebook and an executive summary, following Google's PACE framework
+(Plan, Analyze, Construct, Execute):
 
----
+| # | Stage | Notebook | Summary |
+|---|---|---|---|
+| 1 | Data inspection | [Notebook](Automatidata/Automatidata%20project%20lab.ipynb) | [PDF](Automatidata/Preliminary%20Automatidata%20executive%20summary.pdf) |
+| 2 | Exploratory data analysis | [Notebook](Automatidata/Exploratory_Data_Analysis/Automatidata%20project%20lab.ipynb) | [PDF](Automatidata/Exploratory_Data_Analysis/Exploratory%20Data%20Analysis%20Automatidata%20Executive%20Summary.pdf) |
+| 3 | Statistics and A/B test | [Notebook](Automatidata/Statistical_Review_and_AB_Testing/Automatidata%20project%20lab.ipynb) | [PPTX](Automatidata/Statistical_Review_and_AB_Testing/Statistical_and_AB_testing_Executive_Summary.pptx) |
+| 4 | Fare regression | [Notebook](Automatidata/Building_a_Multiple_Linear_Regression_Model/Automatidata%20project%20lab.ipynb) | [PPTX](Automatidata/Building_a_Multiple_Linear_Regression_Model/Automatidata_Regression_Executive%20Summary.pptx) |
+| 5 | **Tip classifier** | [Notebook](Automatidata/Building_a_Machine_Learning_Model/Automatidata%20project%20lab.ipynb) | [PPTX](Automatidata/Building_a_Machine_Learning_Model/Automatidata_Executive_summary_Classifiers.pptx) |
 
-### Tech Stack & Libraries
+The project plan is in the [PACE strategy document](Automatidata/PACE%20strategy%20document.pdf).
+The trip data sample is [`2017_Yellow_Taxi_Trip_Data.csv`](Automatidata/2017_Yellow_Taxi_Trip_Data.csv).
 
-Here's what I used throughout the project:
+## Run it
 
-**Data Wrangling & Analysis**
-- `pandas` — data manipulation and preprocessing
-- `numpy` — numerical computation
-- `datetime` — working with timestamps
+```bash
+pip install pandas numpy scikit-learn xgboost matplotlib seaborn scipy jupyter
+jupyter notebook
+```
 
-**Data Visualization**
-- `matplotlib.pyplot`
-- `seaborn`
+## Stack
 
-**Machine Learning & Modeling**
-- From `scikit-learn`:
-  - `StandardScaler`, `train_test_split`
-  - `DecisionTreeClassifier`, `RandomForestClassifier`, `LinearRegression`, `GridSearchCV`
-- `XGBoost` — gradient boosting, along with `plot_importance` for feature visualization
-
-**Model Evaluation**
-- `f1_score`, `roc_curve`, `accuracy_score`, `recall`, `precision`
-
----
-
-### Key Findings
-
-- There are strong correlations between trip distance, duration, and fare amount in the dataset.
-- I found several outliers and some missing entries during EDA, which I handled before modeling.
-- Feature scaling and one-hot encoding made a noticeable difference in model stability.
-- Ensemble models like Random Forest and XGBoost performed significantly better than basic regression.
-- The final model achieved solid predictive accuracy on the test set.
-
----
-
-### Outcome
-
-By the end of this project, I had a working ML pipeline that can predict with reasonable accuracy whether a driver will receive a generous tip. The insights from this analysis could be useful for improving fare transparency and understanding tipping behavior in NYC taxis.
-
----
-
-### Connect With Me
-
-LinkedIn: [Swapnanil Bala](https://www.linkedin.com/in/swapnanil-bala-854b722a7/)
-Data Science Student | Machine Learning Enthusiast | Python & SQL Practitioner
-
----
+Python · pandas · scikit-learn · XGBoost · SciPy · matplotlib / seaborn
